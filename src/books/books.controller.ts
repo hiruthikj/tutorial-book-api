@@ -6,7 +6,9 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import {
   ApiCreatedResponse,
   ApiForbiddenResponse,
@@ -23,6 +25,7 @@ import { Book } from './entity/books.entity';
 export class BooksController {
   constructor(private readonly bookService: BooksService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('/')
   @ApiOkResponse({ description: 'Operation Successful', type: [Book] })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
