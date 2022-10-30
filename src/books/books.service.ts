@@ -1,17 +1,31 @@
-import { Body, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
+import { Book } from './entity/books.entity';
 
 @Injectable()
 export class BooksService {
+  constructor(
+    @Inject('BOOKS_REPOSITORY')
+    private readonly booksRepository: typeof Book,
+  ) {}
+
   getAllBooks() {
-    return [];
+    return this.booksRepository.findAll();
   }
 
-  getBook(id: number) {
-    return { id };
+  async getBook(id: string) {
+    const book = await this.booksRepository.findByPk(id);
+
+    if (!book) {
+      throw new NotFoundException(`Book with id ${id} not found`);
+    }
+    return book;
   }
 
   createBook(bookData: CreateBookDto) {
-    return { bookData };
+    const book = new Book();
+    book.title = bookData.title;
+    book.author = bookData.author;
+    return book.save();
   }
 }
